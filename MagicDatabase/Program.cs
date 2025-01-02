@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using MagicCardsAPI.Data;
 using MagicDatabase;
 
+
 var builder = WebApplication.CreateBuilder(args);
 //var builder = WebApplication.CreateBuilder(args);
 
