@@ -59,8 +59,7 @@ namespace MagicDatabase.Controllers
             return NoContent();
         }
     }
-    //prova commento
-
+    //MODIFICATO DA GIT HUB  
     //[ApiController]
     //[Route("api/[controller]")]
     //public class CardsController : ControllerBase
