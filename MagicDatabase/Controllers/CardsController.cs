@@ -59,6 +59,7 @@ namespace MagicDatabase.Controllers
             return NoContent();
         }
     }
+    //prova commento
 
     //[ApiController]
     //[Route("api/[controller]")]
