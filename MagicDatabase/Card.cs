@@ -8,6 +8,7 @@ namespace MagicDatabase
         public int CardId { get; set; }
         public string CardName { get; set; }
 
+
         // Relazioni con altre tabelle
         public int CardRarityId { get; set; }
         public CardRarity CardRarity { get; set; }
