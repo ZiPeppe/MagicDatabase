@@ -1,5 +1,8 @@
-﻿namespace MagicDatabase
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace MagicDatabase
 {
+    [Table("CardLanguage")]
     public class CardLanguage
     {
         public int CardLanguageId { get; set; }

@@ -17,6 +17,9 @@ namespace MagicDatabase
             return await _context.Cards
                 .Include(c => c.CardRarity)
                 .Include(c => c.CardCategory)
+                .Include(c => c.CardLanguage)
+                .Include(c => c.CardArtType)
+                .Include(c => c.CardStatus)
                 .ToListAsync();
         }
 
@@ -25,6 +28,9 @@ namespace MagicDatabase
             return await _context.Cards
                 .Include(c => c.CardRarity)
                 .Include(c => c.CardCategory)
+                .Include(c => c.CardLanguage)
+                .Include(c => c.CardArtType)
+                .Include(c => c.CardStatus)
                 .FirstOrDefaultAsync(c => c.CardId == id);
         }
 
