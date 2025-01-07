@@ -23,6 +23,5 @@ namespace MagicDatabase
 
         public int CardArtTypeId { get; set; }
         public CardArtType CardArtType { get; set; }
-
     }
 }
