@@ -20,28 +20,14 @@ builder.Services.AddDbContext<MagicCardsContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<CardService>();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Magic Cards API",
-        Version = "v1",
-        Description = "API per gestire il database delle Magic Cards."
-    });
-});
 
 builder.Services.AddSwaggerGen(c =>
 {
-
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-
+        Title = "Magic Cards API",
         Version = "v1",
-
-        Title = "JWT Api",
-
-        Description = "Secures API using JWT",
-
+        Description = "API per gestire il database delle Magic Cards con autenticazione JWT."
     });
 
     // To Enable authorization using Swagger (JWT)
