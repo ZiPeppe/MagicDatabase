@@ -1,4 +1,5 @@
 ﻿using MagicDatabase;
+using MagicDatabase.Seeds;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicCardsAPI.Data
@@ -28,76 +29,181 @@ namespace MagicCardsAPI.Data
         // Tabella CardArtType
         public DbSet<CardArtType> CardArtType { get; set; }
 
-
-        // Configurazione tramite Fluent API
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configura la tabella Cards
-            modelBuilder.Entity<Card>(entity =>
-            {
-                entity.ToTable("Cards"); // Nome tabella
-                entity.HasKey(c => c.CardId); // Chiave primaria
-                entity.Property(c => c.CardName)
-                .IsRequired()
-                .HasMaxLength(255); // Nome obbligatorio
-                entity.HasOne(c => c.CardRarity); // Relazione con CardRarity
-                entity.HasOne(c => c.CardStatus); // Relazione con CardStatus
-                entity.HasOne(c => c.CardCategory); // Relazione con CardCategory
-                entity.HasOne(c => c.CardLanguage); // Relazione con CardLanguage
-                entity.HasOne(c => c.CardArtType); // Relazione con CardArtType
+            base.OnModelCreating(modelBuilder);
 
-            });
-
-            // Configura la tabella CardRarity
-            modelBuilder.Entity<CardRarity>(entity =>
-            {
-                entity.ToTable("CardRarity");
-                entity.HasKey(r => r.CardRarityId);
-                entity.Property(r => r.CardRarityName)
-                .IsRequired()
-                .HasMaxLength(100);
-            });
-
-            // Configura la tabella CardStatus
-            modelBuilder.Entity<CardStatus>(entity =>
-            {
-                entity.ToTable("CardStatus");
-                entity.HasKey(s => s.CardStatusId);
-                entity.Property(s => s.CardStatusName)
-                .IsRequired()
-                .HasMaxLength(100);
-            });
-
-            // Configura la tabella CardCategory
+            // Configurazione della tabella CardCategory
             modelBuilder.Entity<CardCategory>(entity =>
             {
-                entity.ToTable("CardCategory");
-                entity.HasKey(r => r.CardCategoryId);
-                entity.Property(r => r.CardCategoryName)
-                .IsRequired()
-                .HasMaxLength(100);
+                entity.ToTable("CardCategories");
+                entity.HasKey(c => c.CardCategoryId);
+                entity.Property(c => c.CardCategoryName).IsRequired().HasMaxLength(100);
+
+                // Aggiungi il seed da classe esterna
+                entity.HasData(CardCategorySeed.GetData());
             });
 
-            // Configura la tabella CardLanguage
-            modelBuilder.Entity<CardLanguage>(entity =>
+            // Configurazione della tabella CardSubCategory
+            modelBuilder.Entity<CardSubCategory>(entity =>
             {
-                entity.ToTable("CardLanguage");
-                entity.HasKey(l => l.CardLanguageId);
-                entity.Property(l => l.CardLanguageName)
-                .IsRequired()
-                .HasMaxLength(100);
+                entity.ToTable("CardSubCategories");
+                entity.HasKey(sc => sc.CardSubCategoryId);
+                entity.Property(sc => sc.CardCategoryName).IsRequired().HasMaxLength(100);
+
+                // Relazione con CardCategory
+                entity.HasOne(sc => sc.CardCategory)
+                    .WithMany(c => c.CardSubCategories)
+                    .HasForeignKey(sc => sc.CardCategoryID);
+
+                // Aggiungi il seed da classe esterna
+                entity.HasData(CardSubCategorySeed.GetData());
             });
 
-            // Configura la tabella CardArtType
+            // Configurazioni per la tabella Cards
+            modelBuilder.Entity<Card>(entity =>
+            {
+                entity.ToTable("Cards");
+                entity.HasKey(c => c.CardId);
+                entity.Property(c => c.CardName).IsRequired().HasMaxLength(255);
+
+                // Relazioni
+                entity.HasOne(c => c.CardArtType)
+                    .WithMany()
+                    .HasForeignKey(c => c.CardArtTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(c => c.CardLanguage)
+                    .WithMany()
+                    .HasForeignKey(c => c.CardLanguageId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(c => c.CardStatus)
+                    .WithMany()
+                    .HasForeignKey(c => c.CardStatusId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(c => c.CardRarity)
+                    .WithMany()
+                    .HasForeignKey(c => c.CardRarityId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configurazioni per la tabella CardArtType
             modelBuilder.Entity<CardArtType>(entity =>
             {
-                entity.ToTable("CardArtType");
+                entity.ToTable("CardArtTypes");
                 entity.HasKey(a => a.CardArtTypeId);
-                entity.Property(a => a.CardArtTypeName)
-                .IsRequired()
-                .HasMaxLength(100);
+                entity.Property(a => a.CardArtTypeName).IsRequired().HasMaxLength(100);
+
+                // Seed data
+                entity.HasData(CardArtTypeSeed.GetData());
+            });
+
+            // Configurazioni per la tabella CardLanguage
+            modelBuilder.Entity<CardLanguage>(entity =>
+            {
+                entity.ToTable("CardLanguages");
+                entity.HasKey(l => l.CardLanguageId);
+                entity.Property(l => l.CardLanguageName).IsRequired().HasMaxLength(100);
+
+                // Seed data
+                entity.HasData(CardLanguageSeed.GetData());
+            });
+
+            // Configurazioni per la tabella CardStatus
+            modelBuilder.Entity<CardStatus>(entity =>
+            {
+                entity.ToTable("CardStatuses");
+                entity.HasKey(s => s.CardStatusId);
+                entity.Property(s => s.CardStatusName).IsRequired().HasMaxLength(100);
+
+                // Seed data
+                entity.HasData(CardStatusSeed.GetData());
+            });
+
+            // Configurazioni per la tabella CardRarity
+            modelBuilder.Entity<CardRarity>(entity =>
+            {
+                entity.ToTable("CardRarities");
+                entity.HasKey(r => r.CardRarityId);
+                entity.Property(r => r.CardRarityName).IsRequired().HasMaxLength(100);
+
+                // Seed data
+                entity.HasData(CardRaritySeed.GetData());
             });
         }
+    }
+}
+        //// Configurazione tramite Fluent API
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    // Configura la tabella Cards
+        //    modelBuilder.Entity<Card>(entity =>
+        //    {
+        //        entity.ToTable("Cards"); // Nome tabella
+        //        entity.HasKey(c => c.CardId); // Chiave primaria
+        //        entity.Property(c => c.CardName)
+        //        .IsRequired()
+        //        .HasMaxLength(255); // Nome obbligatorio
+        //        entity.HasOne(c => c.CardRarity); // Relazione con CardRarity
+        //        entity.HasOne(c => c.CardStatus); // Relazione con CardStatus
+        //        entity.HasOne(c => c.CardCategory); // Relazione con CardCategory
+        //        entity.HasOne(c => c.CardLanguage); // Relazione con CardLanguage
+        //        entity.HasOne(c => c.CardArtType); // Relazione con CardArtType
+
+        //    });
+
+        //    // Configura la tabella CardRarity
+        //    modelBuilder.Entity<CardRarity>(entity =>
+        //    {
+        //        entity.ToTable("CardRarity");
+        //        entity.HasKey(r => r.CardRarityId);
+        //        entity.Property(r => r.CardRarityName)
+        //        .IsRequired()
+        //        .HasMaxLength(100);
+        //    });
+
+        //    // Configura la tabella CardStatus
+        //    modelBuilder.Entity<CardStatus>(entity =>
+        //    {
+        //        entity.ToTable("CardStatus");
+        //        entity.HasKey(s => s.CardStatusId);
+        //        entity.Property(s => s.CardStatusName)
+        //        .IsRequired()
+        //        .HasMaxLength(100);
+        //    });
+
+        //    // Configura la tabella CardCategory
+        //    modelBuilder.Entity<CardCategory>(entity =>
+        //    {
+        //        entity.ToTable("CardCategory");
+        //        entity.HasKey(r => r.CardCategoryId);
+        //        entity.Property(r => r.CardCategoryName)
+        //        .IsRequired()
+        //        .HasMaxLength(100);
+        //    });
+
+        //    // Configura la tabella CardLanguage
+        //    modelBuilder.Entity<CardLanguage>(entity =>
+        //    {
+        //        entity.ToTable("CardLanguage");
+        //        entity.HasKey(l => l.CardLanguageId);
+        //        entity.Property(l => l.CardLanguageName)
+        //        .IsRequired()
+        //        .HasMaxLength(100);
+        //    });
+
+        //    // Configura la tabella CardArtType
+        //    modelBuilder.Entity<CardArtType>(entity =>
+        //    {
+        //        entity.ToTable("CardArtType");
+        //        entity.HasKey(a => a.CardArtTypeId);
+        //        entity.Property(a => a.CardArtTypeName)
+        //        .IsRequired()
+        //        .HasMaxLength(100);
+        //    });
+        //}
 
         /*public class MagicDbContext : DbContext
         {
@@ -159,5 +265,4 @@ namespace MagicCardsAPI.Data
         //            .HasForeignKey(c => c.CardStatusId);
         //    }
         //}
-    }
-}
+

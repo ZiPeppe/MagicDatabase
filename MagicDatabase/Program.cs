@@ -18,8 +18,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MagicCardsContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MagicDatabase")));
 builder.Services.AddControllers();
-builder.Services.AddScoped<CardService>();
+builder.Services.AddScoped<CardService>(); //addtransient //addsingleton
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddSwaggerGen(c =>
 {
