@@ -5,9 +5,10 @@
         public int CardSubCategoryId { get; set; }
         public string CardSubCategoryName { get; set; }
 
-        // Relazione con CardCategory
+        // Foreign Key
         public int CardCategoryID { get; set; }
-        public string CardCategoryName { get; set; }
+
+        // Relazione con CardCategory
         public CardCategory CardCategory { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace MagicDatabase
         public int CardCategoryId { get; set; }
         public string CardCategoryName { get; set; }
 
-        public ICollection<Card> Cards { get; set; } // Relazione 1 a molti prova per capire se funziona con MARKO
+        //public ICollection<Card> Cards { get; set; } // Relazione 1 a molti prova per capire se funziona con MARKO
 
         // Relazione con CardSubCategory
         public ICollection<CardSubCategory> CardSubCategories { get; set; }
