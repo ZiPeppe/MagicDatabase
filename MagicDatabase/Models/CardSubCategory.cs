@@ -1,4 +1,4 @@
-﻿namespace MagicDatabase
+﻿namespace MagicDatabase.Models
 {
     public class CardSubCategory
     {

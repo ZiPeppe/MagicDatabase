@@ -1,4 +1,4 @@
-﻿using MagicDatabase;
+﻿using MagicDatabase.Models;
 using MagicDatabase.Seeds;
 using Microsoft.EntityFrameworkCore;
 

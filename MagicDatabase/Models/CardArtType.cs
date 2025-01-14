@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MagicDatabase
+namespace MagicDatabase.Models
 {
     [Table("CardArtType")]
     public class CardArtType

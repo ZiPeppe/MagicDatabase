@@ -1,4 +1,6 @@
-﻿namespace MagicDatabase.Seeds
+﻿using MagicDatabase.Models;
+
+namespace MagicDatabase.Seeds
 {
     public static class CardArtTypeSeed
     {

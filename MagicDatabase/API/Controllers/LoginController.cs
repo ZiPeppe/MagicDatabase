@@ -1,8 +1,8 @@
 ﻿using MagicDatabase.Models;
-using MagicDatabase.Services;
+using MagicDatabase.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MagicDatabase.Controllers
+namespace MagicDatabase.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -38,7 +38,7 @@ namespace MagicDatabase.Controllers
 
             var token = _jwtService.GenerateToken(user);
 
-            return Ok(new { token = token });
+            return Ok(new { token });
 
         }
 

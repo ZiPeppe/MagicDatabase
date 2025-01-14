@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using MagicDatabase.Models;
 
-namespace MagicDatabase.Services
+namespace MagicDatabase.Services.Implementations
 {
     public class JwtService
     {

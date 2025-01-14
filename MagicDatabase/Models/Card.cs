@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace MagicDatabase
+namespace MagicDatabase.Models
 {
     public class Card
     {
