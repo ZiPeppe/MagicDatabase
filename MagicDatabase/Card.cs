@@ -16,8 +16,8 @@ namespace MagicDatabase
         public int CardStatusId { get; set; }
         public CardStatus CardStatus { get; set; }
 
-        public int CardCategoryId { get; set; }
-        public CardCategory CardCategory { get; set; }
+        public int CardSubCategoryId { get; set; }
+        public CardSubCategory CardSubCategory { get; set; }
 
         public int CardLanguageId { get; set; }
         public CardLanguage CardLanguage { get; set; }

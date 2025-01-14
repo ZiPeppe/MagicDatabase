@@ -3,6 +3,7 @@ using MagicCardsAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using MagicDatabase.DTOs;
 using AutoMapper;
+using MagicDatabase.Repositories;
 
 
 namespace MagicDatabase.Controllers
@@ -11,29 +12,34 @@ namespace MagicDatabase.Controllers
     [Route("api/[controller]")]
     public class CardsController : ControllerBase
     {
-        private readonly CardService _cardService;
+        private readonly CardRepository _cardRepository;
         private readonly IMapper _mapper;
         
-        public CardsController(CardService cardService, IMapper mapper)
+        public CardsController(CardRepository cardRepository, IMapper mapper)
         {
-            _cardService = cardService;
+            _cardRepository = cardRepository;
             _mapper = mapper;
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCardById(int id)
+        public async Task<ActionResult<CardDetailsDto>> GetCard(int id)
         {
-            var card = await _cardService.GetCardByIdAsync(id);
+            // Usa il repository per recuperare la carta
+            var card = await _cardRepository.GetCardByIdAsync(id);
+
             if (card == null)
             {
                 return NotFound();
             }
 
-            return Ok(card);
+            // Mappa l'entità al DTO
+            var cardDetailsDto = _mapper.Map<CardDetailsDto>(card);
+
+            return Ok(cardDetailsDto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCard([FromBody] CardsDTO cardDto)
+        public async Task<IActionResult> CreateCard([FromBody] CardDto cardDto)
         {
             if (cardDto == null)
             {
@@ -44,203 +50,231 @@ namespace MagicDatabase.Controllers
             var newCard = _mapper.Map<Card>(cardDto);
 
             // Salva la nuova entità nel database
-            await _cardService.AddCardAsync(newCard);
+            await _cardRepository.AddCardAsync(newCard);
 
             // Restituisci un risultato con il nuovo oggetto creato
-            return CreatedAtAction(nameof(GetCardById), new { id = newCard.CardId }, newCard);
+            return CreatedAtAction(nameof(GetCard), new { id = newCard.CardId }, newCard);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateCard(int id, [FromBody] CardsDTO cardDto)
-        //{
-        //    if (id != cardDto.CardId)
-        //    {
-        //        return BadRequest("The Card ID in the URL does not match the ID in the request body.");
-        //    }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCard(int id, [FromBody] CardUpdateDto cardUpdateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //    // Recupera la carta esistente dal database
-        //    var existingCard = await _cardService.GetCardByIdAsync(id);
-        //    if (existingCard == null)
-        //    {
-        //        return NotFound($"Card with ID {id} not found.");
-        //    }
+            // Recupera l'entità dal repository
+            var existingCard = await _cardRepository.GetCardByIdAsync(id);
+            if (existingCard == null)
+            {
+                return NotFound();
+            }
 
-        //    // Mappa i dati del DTO sull'entità esistente
-        //    _mapper.Map(cardDto, existingCard);
+            // Mappa il DTO sull'entità esistente
+            _mapper.Map(cardUpdateDto, existingCard);
 
-        //    // Aggiorna la carta usando il servizio
-        //    await _cardService.UpdateCardAsync(existingCard);
+            // Aggiorna l'entità
+            var success = await _cardRepository.UpdateCardAsync(existingCard);
+            if (!success)
+            {
+                return StatusCode(500, "Non è stato possibile aggiornare la carta.");
+            }
 
-        //    return NoContent();
-        //}
+            return NoContent(); // Restituisce 204 No Content
 
+            //[HttpPut("{id}")]
+            //public async Task<IActionResult> UpdateCard(int id, [FromBody] CardsDTO cardDto)
+            //{
+            //    if (id != cardDto.CardId)
+            //    {
+            //        return BadRequest("The Card ID in the URL does not match the ID in the request body.");
+            //    }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateCard(int id, [FromBody] CardsDTO card)
-        //{
-        //    if (id != card.CardId)
-        //    {
-        //        return BadRequest();
-        //    }
+            //    // Recupera la carta esistente dal database
+            //    var existingCard = await _cardService.GetCardByIdAsync(id);
+            //    if (existingCard == null)
+            //    {
+            //        return NotFound($"Card with ID {id} not found.");
+            //    }
 
-        //    await _cardService.UpdateCardAsync(card);
-        //    return NoContent();
-        //}
+            //    // Mappa i dati del DTO sull'entità esistente
+            //    _mapper.Map(cardDto, existingCard);
 
-        //    [HttpGet]
-        //    public async Task<IActionResult> GetAllCards()
-        //    {
-        //        var cards = await _cardService.GetAllCardsAsync();
-        //        return Ok(cards);
-        //    }
+            //    // Aggiorna la carta usando il servizio
+            //    await _cardService.UpdateCardAsync(existingCard);
 
-        //    [HttpGet("{id}")]
-        //    public async Task<IActionResult> GetCardById(int id)
-        //    {
-        //        var card = await _cardService.GetCardByIdAsync(id);
-        //        if (card == null)
-        //        {
-        //            return NotFound();
-        //        }
-        //        return Ok(card);
-        //    }
-
-        //    [HttpPost]
-        //    public async Task<IActionResult> AddCard([FromBody] Card card)
-        //    {
-        //        await _cardService.AddCardAsync(card);
-        //        return CreatedAtAction(nameof(GetCardById), new { id = card.CardId }, card);
-        //    }
+            //    return NoContent();
+            //}
 
 
+            //[HttpPut("{id}")]
+            //public async Task<IActionResult> UpdateCard(int id, [FromBody] CardsDTO card)
+            //{
+            //    if (id != card.CardId)
+            //    {
+            //        return BadRequest();
+            //    }
 
-        //    [HttpDelete("{id}")]
-        //    public async Task<IActionResult> DeleteCard(int id)
-        //    {
-        //        await _cardService.DeleteCardAsync(id);
-        //        return NoContent();
-        //    }
-        //}
-        //MODIFICATO DA GIT HUB  
-        //[ApiController]
-        //[Route("api/[controller]")]
-        //public class CardsController : ControllerBase
-        //{
-        //    private readonly MagicCardsContext _context;
+            //    await _cardService.UpdateCardAsync(card);
+            //    return NoContent();
+            //}
 
-        //    public CardsController(MagicCardsContext context)
-        //    {
-        //        _context = context;
-        //    }
+            //    [HttpGet]
+            //    public async Task<IActionResult> GetAllCards()
+            //    {
+            //        var cards = await _cardService.GetAllCardsAsync();
+            //        return Ok(cards);
+            //    }
 
-        //    [HttpGet]
-        //    public async Task<ActionResult<IEnumerable<Card>>> GetCards()
-        //    {
-        //        return await _context.Cards.ToListAsync();
-        //    }
+            //    [HttpGet("{id}")]
+            //    public async Task<IActionResult> GetCardById(int id)
+            //    {
+            //        var card = await _cardService.GetCardByIdAsync(id);
+            //        if (card == null)
+            //        {
+            //            return NotFound();
+            //        }
+            //        return Ok(card);
+            //    }
 
-        //    [HttpGet("{id}")]
-        //    public async Task<ActionResult<Card>> GetCard(int id)
-        //    {
-        //        var card = await _context.Cards.FindAsync(id);
+            //    [HttpPost]
+            //    public async Task<IActionResult> AddCard([FromBody] Card card)
+            //    {
+            //        await _cardService.AddCardAsync(card);
+            //        return CreatedAtAction(nameof(GetCardById), new { id = card.CardId }, card);
+            //    }
 
-        //        if (card == null)
-        //        {
-        //            return NotFound();
-        //        }
 
-        //        return card;
-        //    }
 
-        //    [HttpPost]
-        //    public async Task<ActionResult<Card>> PostCard(Card card)
-        //    {
-        //        _context.Cards.Add(card);
-        //        await _context.SaveChangesAsync();
+            //    [HttpDelete("{id}")]
+            //    public async Task<IActionResult> DeleteCard(int id)
+            //    {
+            //        await _cardService.DeleteCardAsync(id);
+            //        return NoContent();
+            //    }
+            //}
+            //MODIFICATO DA GIT HUB  
+            //[ApiController]
+            //[Route("api/[controller]")]
+            //public class CardsController : ControllerBase
+            //{
+            //    private readonly MagicCardsContext _context;
 
-        //        return CreatedAtAction(nameof(GetCard), new { id = card.CardId }, card);
-        //    }
+            //    public CardsController(MagicCardsContext context)
+            //    {
+            //        _context = context;
+            //    }
 
-        //    [HttpPut("{id}")]
-        //    public async Task<IActionResult> PutCard(int id, Card card)
-        //    {
-        //        if (id != card.CardId)
-        //        {
-        //            return BadRequest();
-        //        }
+            //    [HttpGet]
+            //    public async Task<ActionResult<IEnumerable<Card>>> GetCards()
+            //    {
+            //        return await _context.Cards.ToListAsync();
+            //    }
 
-        //        _context.Entry(card).State = EntityState.Modified;
+            //    [HttpGet("{id}")]
+            //    public async Task<ActionResult<Card>> GetCard(int id)
+            //    {
+            //        var card = await _context.Cards.FindAsync(id);
 
-        //        try
-        //        {
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!_context.Cards.Any(e => e.CardId == id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
+            //        if (card == null)
+            //        {
+            //            return NotFound();
+            //        }
 
-        //        return NoContent();
-        //    }
+            //        return card;
+            //    }
 
-        //    [HttpDelete("{id}")]
-        //    public async Task<IActionResult> DeleteCard(int id)
-        //    {
-        //        var card = await _context.Cards.FindAsync(id);
-        //        if (card == null)
-        //        {
-        //            return NotFound();
-        //        }
+            //    [HttpPost]
+            //    public async Task<ActionResult<Card>> PostCard(Card card)
+            //    {
+            //        _context.Cards.Add(card);
+            //        await _context.SaveChangesAsync();
 
-        //        _context.Cards.Remove(card);
-        //        await _context.SaveChangesAsync();
+            //        return CreatedAtAction(nameof(GetCard), new { id = card.CardId }, card);
+            //    }
 
-        //        return NoContent();
-        //    }
-        //}
+            //    [HttpPut("{id}")]
+            //    public async Task<IActionResult> PutCard(int id, Card card)
+            //    {
+            //        if (id != card.CardId)
+            //        {
+            //            return BadRequest();
+            //        }
 
-        //[ApiController]
-        //[Route("api/[controller]")]
-        //public class CardsController : ControllerBase
-        //{
-        //    private readonly MagicCardsContext _context;
+            //        _context.Entry(card).State = EntityState.Modified;
 
-        //    public CardsController(MagicCardsContext context) => _context = context;
+            //        try
+            //        {
+            //            await _context.SaveChangesAsync();
+            //        }
+            //        catch (DbUpdateConcurrencyException)
+            //        {
+            //            if (!_context.Cards.Any(e => e.CardId == id))
+            //            {
+            //                return NotFound();
+            //            }
+            //            else
+            //            {
+            //                throw;
+            //            }
+            //        }
 
-        //    [HttpGet] // Ottieni tutte le carte
-        //    public async Task<ActionResult<IEnumerable<Card>>> GetCards() => await _context.Cards.ToListAsync();
+            //        return NoContent();
+            //    }
 
-        //    [HttpGet("{id}")] // Ottieni una carta specifica
-        //    public async Task<ActionResult<Card>> GetCard(int id)
-        //    {
-        //        var card = await _context.Cards.FindAsync(id);
-        //        return card == null ? NotFound() : card;
-        //    }
+            //    [HttpDelete("{id}")]
+            //    public async Task<IActionResult> DeleteCard(int id)
+            //    {
+            //        var card = await _context.Cards.FindAsync(id);
+            //        if (card == null)
+            //        {
+            //            return NotFound();
+            //        }
 
-        //    [HttpPost] // Aggiungi una nuova carta
-        //    public async Task<ActionResult<Card>> PostCard(Card card)
-        //    {
-        //        _context.Cards.Add(card);
-        //        await _context.SaveChangesAsync();
-        //        return CreatedAtAction(nameof(GetCard), new { id = card.CardId }, card);
-        //    }
+            //        _context.Cards.Remove(card);
+            //        await _context.SaveChangesAsync();
 
-        //    [HttpDelete("{id}")] // Elimina una carta
-        //    public async Task<IActionResult> DeleteCard(int id)
-        //    {
-        //        var card = await _context.Cards.FindAsync(id);
-        //        if (card == null) return NotFound();
-        //        _context.Cards.Remove(card);
-        //        await _context.SaveChangesAsync();
-        //        return NoContent();
-        //    }
-        //}
+            //        return NoContent();
+            //    }
+            //}
+
+            //[ApiController]
+            //[Route("api/[controller]")]
+            //public class CardsController : ControllerBase
+            //{
+            //    private readonly MagicCardsContext _context;
+
+            //    public CardsController(MagicCardsContext context) => _context = context;
+
+            //    [HttpGet] // Ottieni tutte le carte
+            //    public async Task<ActionResult<IEnumerable<Card>>> GetCards() => await _context.Cards.ToListAsync();
+
+            //    [HttpGet("{id}")] // Ottieni una carta specifica
+            //    public async Task<ActionResult<Card>> GetCard(int id)
+            //    {
+            //        var card = await _context.Cards.FindAsync(id);
+            //        return card == null ? NotFound() : card;
+            //    }
+
+            //    [HttpPost] // Aggiungi una nuova carta
+            //    public async Task<ActionResult<Card>> PostCard(Card card)
+            //    {
+            //        _context.Cards.Add(card);
+            //        await _context.SaveChangesAsync();
+            //        return CreatedAtAction(nameof(GetCard), new { id = card.CardId }, card);
+            //    }
+
+            //    [HttpDelete("{id}")] // Elimina una carta
+            //    public async Task<IActionResult> DeleteCard(int id)
+            //    {
+            //        var card = await _context.Cards.FindAsync(id);
+            //        if (card == null) return NotFound();
+            //        _context.Cards.Remove(card);
+            //        await _context.SaveChangesAsync();
+            //        return NoContent();
+            //    }
+            //}
+        }
     }
-}
+};

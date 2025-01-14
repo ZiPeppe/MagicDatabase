@@ -1,13 +1,13 @@
 ﻿using MagicCardsAPI.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace MagicDatabase
+namespace MagicDatabase.Repositories
 {
-    public class CardService
+    public class CardRepository
     {
         private readonly MagicCardsContext _context;
 
-        public CardService(MagicCardsContext context)
+        public CardRepository(MagicCardsContext context)
         {
             _context = context;
         }
@@ -16,7 +16,7 @@ namespace MagicDatabase
         {
             return await _context.Cards
                 .Include(c => c.CardRarity)
-                .Include(c => c.CardCategory)
+                .Include(c => c.CardSubCategory)
                 .Include(c => c.CardLanguage)
                 .Include(c => c.CardArtType)
                 .Include(c => c.CardStatus)
@@ -27,7 +27,7 @@ namespace MagicDatabase
         {
             return await _context.Cards
                 .Include(c => c.CardRarity)
-                .Include(c => c.CardCategory)
+                .Include(c => c.CardSubCategory)
                 .Include(c => c.CardLanguage)
                 .Include(c => c.CardArtType)
                 .Include(c => c.CardStatus)
@@ -40,10 +40,26 @@ namespace MagicDatabase
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateCardAsync(Card card)
+        public async Task<bool> UpdateCardAsync(Card card)
         {
-            _context.Cards.Update(card);
+            var existingCard = await _context.Cards.FindAsync(card.CardId);
+            if (existingCard == null)
+            {
+                return false; // La carta non esiste
+            }
+
+            // Aggiorna le proprietà
+            existingCard.CardName = card.CardName;
+            existingCard.CardRarityId = card.CardRarityId;
+            existingCard.CardStatusId = card.CardStatusId;
+            existingCard.CardSubCategoryId = card.CardSubCategoryId;
+            existingCard.CardLanguageId = card.CardLanguageId;
+            existingCard.CardArtTypeId = card.CardArtTypeId;
+
+            _context.Cards.Update(existingCard);
             await _context.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task DeleteCardAsync(int id)

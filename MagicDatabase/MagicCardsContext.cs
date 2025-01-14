@@ -49,7 +49,6 @@ namespace MagicCardsAPI.Data
             {
                 entity.ToTable("CardSubCategories");
                 entity.HasKey(sc => sc.CardSubCategoryId);
-                entity.Property(sc => sc.CardCategoryName).IsRequired().HasMaxLength(100);
 
                 // Relazione con CardCategory
                 entity.HasOne(sc => sc.CardCategory)

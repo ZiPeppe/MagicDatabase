@@ -21,6 +21,7 @@
                 new CardArtType { CardArtTypeId = 13, CardArtTypeName = "Promo" },
                 new CardArtType { CardArtTypeId = 14, CardArtTypeName = "Promo Foil" },
                 new CardArtType { CardArtTypeId = 15, CardArtTypeName = "Missprint" },
+                new CardArtType { CardArtTypeId = 16, CardArtTypeName = "None" }
             };
         }
     }

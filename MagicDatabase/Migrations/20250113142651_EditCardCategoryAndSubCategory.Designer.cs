@@ -3,6 +3,7 @@ using MagicCardsAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MagicDatabase.Migrations
 {
     [DbContext(typeof(MagicCardsContext))]
-    partial class MagicCardsContextModelSnapshot : ModelSnapshot
+    [Migration("20250113142651_EditCardCategoryAndSubCategory")]
+    partial class EditCardCategoryAndSubCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,6 +35,9 @@ namespace MagicDatabase.Migrations
                     b.Property<int>("CardArtTypeId")
                         .HasColumnType("int");
 
+                    b.Property<int>("CardCategoryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CardLanguageId")
                         .HasColumnType("int");
 
@@ -46,20 +52,17 @@ namespace MagicDatabase.Migrations
                     b.Property<int>("CardStatusId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CardSubCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("CardId");
 
                     b.HasIndex("CardArtTypeId");
+
+                    b.HasIndex("CardCategoryId");
 
                     b.HasIndex("CardLanguageId");
 
                     b.HasIndex("CardRarityId");
 
                     b.HasIndex("CardStatusId");
-
-                    b.HasIndex("CardSubCategoryId");
 
                     b.ToTable("Cards", (string)null);
                 });
@@ -430,6 +433,12 @@ namespace MagicDatabase.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MagicDatabase.CardCategory", "CardCategory")
+                        .WithMany()
+                        .HasForeignKey("CardCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MagicDatabase.CardLanguage", "CardLanguage")
                         .WithMany()
                         .HasForeignKey("CardLanguageId")
@@ -448,21 +457,15 @@ namespace MagicDatabase.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MagicDatabase.CardSubCategory", "CardSubCategory")
-                        .WithMany()
-                        .HasForeignKey("CardSubCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("CardArtType");
+
+                    b.Navigation("CardCategory");
 
                     b.Navigation("CardLanguage");
 
                     b.Navigation("CardRarity");
 
                     b.Navigation("CardStatus");
-
-                    b.Navigation("CardSubCategory");
                 });
 
             modelBuilder.Entity("MagicDatabase.CardSubCategory", b =>

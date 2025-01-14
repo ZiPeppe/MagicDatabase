@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MagicDatabase.Services;
+using MagicDatabase.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MagicCardsContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MagicDatabase")));
 builder.Services.AddControllers();
-builder.Services.AddScoped<CardService>(); //addtransient //addsingleton
+builder.Services.AddScoped<CardRepository>(); //addtransient //addsingleton
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
