@@ -6,12 +6,14 @@ using MagicDatabase.Repositories;
 using MagicDatabase.API.DTOs;
 using MagicDatabase.Models;
 using MagicDatabase.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace MagicDatabase.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CardsController : ControllerBase
     {
         private readonly ICardService _cardService;
@@ -23,21 +25,50 @@ namespace MagicDatabase.API.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CardDetailsDto>>> GetAllCards()
+        {
+            try
+            {
+                // Recupera le carte tramite il servizio
+                var cards = await _cardService.GetAllCardsAsync();
+
+                if (cards == null || !cards.Any())
+                {
+                    return NotFound("No cards found.");
+                }
+
+                return Ok(cards); // Restituisce le carte trovate
+            }
+            catch (Exception ex)
+            {
+                // Log dell'errore
+                Console.WriteLine($"Errore nel cercare le carte: {ex.Message}");
+                return StatusCode(500, "Errore nel ritornare le carte.");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<CardDetailsDto>> GetCard(int id)
         {
-            // Usa il repository per recuperare la carta
-            var card = await _cardService.GetCardByIdAsync(id);
-
-            if (card == null)
+            try
             {
-                return NotFound();
+                // Usa il servizio per recuperare il DTO
+                var cardDetailsDto = await _cardService.GetCardByIdAsync(id);
+
+                if (cardDetailsDto == null)
+                {
+                    return NotFound(new { message = $"Card with ID {id} not found." });
+                }
+
+                return Ok(cardDetailsDto); // Restituisci direttamente il DTO
             }
-
-            // Mappa l'entità al DTO
-            var cardDetailsDto = _mapper.Map<CardDetailsDto>(card);
-
-            return Ok(cardDetailsDto);
+            catch (Exception ex)
+            {
+                // Log dell'errore
+                Console.WriteLine($"Errore nel cercare le carte: {ex.Message}");
+                return StatusCode(500, "Errore nel ritornare le carte.");
+            }
         }
 
         [HttpPost]
