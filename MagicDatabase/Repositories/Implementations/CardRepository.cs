@@ -41,33 +41,50 @@ namespace MagicDatabase.Repositories.Implementations
         }
 
         // Aggiunge una nuova carta
-        public async Task AddCardAsync(Card card)
+        public async Task<Card> AddCardAsync(Card card)
         {
+            // Aggiungi la nuova carta al contesto
             await _context.Cards.AddAsync(card);
-            await _context.SaveChangesAsync();
+
+            // Salva i cambiamenti
+            int result = await _context.SaveChangesAsync();
+
+            // Controlla se l'operazione ha avuto successo
+            if (result > 0)
+            {
+                // Carica le relazioni della carta appena salvata
+                return await _context.Cards
+                    .Include(c => c.CardRarity)
+                    .Include(c => c.CardStatus)
+                    .Include(c => c.CardSubCategory)
+                        .ThenInclude(sub => sub.CardCategory)
+                    .Include(c => c.CardLanguage)
+                    .Include(c => c.CardArtType)
+                    .FirstOrDefaultAsync(c => c.CardId == card.CardId);
+            }
+
+            // In caso di fallimento, lancia un'eccezione o restituisci null
+            throw new Exception("Non sono riuscito ad aggiungere la carta al database :( ");
         }
 
         // Aggiorna una carta esistente
         public async Task<bool> UpdateCardAsync(Card card)
         {
             var existingCard = await _context.Cards.FindAsync(card.CardId);
+
             if (existingCard == null)
             {
-                return false;
+                return false; // La carta non esiste
             }
 
-            // Aggiorna i campi esistenti con i nuovi valori
-            existingCard.CardName = card.CardName;
-            existingCard.CardRarityId = card.CardRarityId;
-            existingCard.CardStatusId = card.CardStatusId;
-            existingCard.CardSubCategoryId = card.CardSubCategoryId;
-            existingCard.CardLanguageId = card.CardLanguageId;
-            existingCard.CardArtTypeId = card.CardArtTypeId;
+            // Segna l'entità come modificata
+            _context.Entry(existingCard).CurrentValues.SetValues(card);
 
-            _context.Cards.Update(existingCard);
-            await _context.SaveChangesAsync();
+            // Salva i cambiamenti
+            int result = await _context.SaveChangesAsync();
 
-            return true;
+            // Restituisci true se l'operazione ha aggiornato almeno una riga
+            return result > 0;
         }
 
         // Elimina una carta per ID
@@ -80,9 +97,10 @@ namespace MagicDatabase.Repositories.Implementations
             }
 
             _context.Cards.Remove(card);
-            await _context.SaveChangesAsync();
+            int result = await _context.SaveChangesAsync();
 
-            return true;
+            // Restituisci true se è stato eliminato almeno un record
+            return result > 0;
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using MagicDatabase.API.DTOs;
+using MagicDatabase.DTOs;
 using MagicDatabase.Models;
 using MagicDatabase.Repositories.Interfaces;
 using MagicDatabase.Services.Interfaces;
@@ -29,10 +29,15 @@ namespace MagicDatabase.Services.Implementations
             return _mapper.Map<IEnumerable<CardDetailsDto>>(cards);
         }
 
-        public async Task AddCardAsync(CardDto cardDto)
+        public async Task<CardDetailsDto> AddCardAsync(CardDto cardDto)
         {
             var card = _mapper.Map<Card>(cardDto);
-            await _cardRepository.AddCardAsync(card);
+
+            // Salva la carta e ottieni l'entità con l'ID aggiornato
+            var savedCard = await _cardRepository.AddCardAsync(card);
+
+            // Restituisci un DTO con i dettagli della carta salvata
+            return _mapper.Map<CardDetailsDto>(savedCard);
         }
 
         public async Task<bool> UpdateCardAsync(int id, CardUpdateDto cardUpdateDto)

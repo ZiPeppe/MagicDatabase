@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MagicDatabase.Models;
-using MagicDatabase.API.DTOs;
+using MagicDatabase.DTOs;
 
 namespace MagicDatabase
 {

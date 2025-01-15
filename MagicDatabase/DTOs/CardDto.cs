@@ -1,4 +1,4 @@
-﻿namespace MagicDatabase.API.DTOs
+﻿namespace MagicDatabase.DTOs
 {
     public class CardDto
     {

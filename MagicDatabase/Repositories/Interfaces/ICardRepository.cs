@@ -11,7 +11,7 @@ namespace MagicDatabase.Repositories.Interfaces
         Task<IEnumerable<Card>> GetAllCardsAsync();
 
         // Aggiunge una nuova carta
-        Task AddCardAsync(Card card);
+        Task<Card> AddCardAsync(Card card);
 
         // Aggiorna una carta esistente
         Task<bool> UpdateCardAsync(Card card);

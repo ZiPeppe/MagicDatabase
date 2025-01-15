@@ -3,10 +3,10 @@ using MagicCardsAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using MagicDatabase.Repositories;
-using MagicDatabase.API.DTOs;
 using MagicDatabase.Models;
 using MagicDatabase.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using MagicDatabase.DTOs;
 
 
 namespace MagicDatabase.API.Controllers
@@ -66,42 +66,58 @@ namespace MagicDatabase.API.Controllers
             catch (Exception ex)
             {
                 // Log dell'errore
-                Console.WriteLine($"Errore nel cercare le carte: {ex.Message}");
-                return StatusCode(500, "Errore nel ritornare le carte.");
+                Console.WriteLine($"Errore nel cercare la carta: {ex.Message}");
+                return StatusCode(500, "Errore nel ritornare la carta.");
             }
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateCard([FromBody] CardDto cardDto)
         {
-            if (cardDto == null)
+            try
             {
-                return BadRequest("The Card data cannot be null.");
+                if (cardDto == null)
+                {
+                    return BadRequest("The Card data cannot be null.");
+                }
+
+                var createdCard = await _cardService.AddCardAsync(cardDto);
+
+                return CreatedAtAction(nameof(GetCard), new { id = createdCard.CardId }, createdCard);
             }
-
-            // Usa il servizio per aggiungere la carta
-            await _cardService.AddCardAsync(cardDto);
-
-            // Restituisci Created con il risultato
-            return CreatedAtAction(nameof(GetCard), new { id = cardDto.CardId }, cardDto);
+            catch (Exception ex)
+            {
+                // Log dell'errore (opzionale)
+                Console.WriteLine($"Errore nel creare le carte: {ex.Message}");
+                return StatusCode(500, "Errore nel creare le carte.");
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCard(int id, [FromBody] CardUpdateDto cardUpdateDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var success = await _cardService.UpdateCardAsync(id, cardUpdateDto);
+
+                if (!success)
+                {
+                    return NotFound(new { message = $"Card with ID {id} not found." });
+                }
+
+                return NoContent();
             }
-
-            var success = await _cardService.UpdateCardAsync(id, cardUpdateDto);
-
-            if (!success)
+            catch (Exception ex)
             {
-                return NotFound(new { message = $"Card with ID {id} not found." });
+                // Log dell'errore (opzionale)
+                Console.WriteLine($"Errore nel modificare le carte: {ex.Message}");
+                return StatusCode(500, "Errore nel modificare le carte.");
             }
-
-            return NoContent();
         }
 
         [HttpDelete("{id}")]
@@ -121,9 +137,9 @@ namespace MagicDatabase.API.Controllers
             catch (Exception ex)
             {
                 // Log dell'errore (opzionale)
-                Console.WriteLine($"Error while deleting card: {ex.Message}");
+                Console.WriteLine($"Errore nel eliminare la carta: {ex.Message}");
 
-                return StatusCode(500, new { message = "An error occurred while deleting the card." });
+                return StatusCode(500, new { message = "Errore nel eliminare la carta." });
             }
         }
     }
