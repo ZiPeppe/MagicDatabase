@@ -1,6 +1,6 @@
 ﻿using MagicDatabase.Models;
 
-namespace MagicDatabase.Services.Interfaces
+namespace MagicDatabase.Repositories.Interfaces
 {
     public interface ICardRepository
     {

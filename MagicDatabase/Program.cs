@@ -8,9 +8,10 @@ using MagicDatabase;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using MagicDatabase.Repositories;
 using MagicDatabase.Services.Implementations;
 using MagicDatabase.Services.Interfaces;
+using MagicDatabase.Repositories.Implementations;
+using MagicDatabase.Repositories.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);

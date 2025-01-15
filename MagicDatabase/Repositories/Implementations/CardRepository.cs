@@ -1,9 +1,9 @@
 ﻿using MagicCardsAPI.Data;
 using MagicDatabase.Models;
-using MagicDatabase.Services.Interfaces;
+using MagicDatabase.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace MagicDatabase.Repositories
+namespace MagicDatabase.Repositories.Implementations
 {
     public class CardRepository : ICardRepository
     {

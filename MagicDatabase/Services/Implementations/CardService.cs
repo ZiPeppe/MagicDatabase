@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MagicDatabase.API.DTOs;
 using MagicDatabase.Models;
+using MagicDatabase.Repositories.Interfaces;
 using MagicDatabase.Services.Interfaces;
 
 namespace MagicDatabase.Services.Implementations
