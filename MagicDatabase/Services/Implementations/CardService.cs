@@ -31,13 +31,17 @@ namespace MagicDatabase.Services.Implementations
 
         public async Task<CardDetailsDto> AddCardAsync(CardDto cardDto)
         {
+            // Mappa il DTO all'entità Card
             var card = _mapper.Map<Card>(cardDto);
 
-            // Salva la carta e ottieni l'entità con l'ID aggiornato
+            // Salva la carta tramite il repository
             var savedCard = await _cardRepository.AddCardAsync(card);
 
-            // Restituisci un DTO con i dettagli della carta salvata
-            return _mapper.Map<CardDetailsDto>(savedCard);
+            // Carica le relazioni usando un metodo esistente o dedicato
+            var cardWithRelations = await _cardRepository.GetCardByIdAsync(savedCard.CardId);
+
+            // Restituisci un DTO completo della carta salvata
+            return _mapper.Map<CardDetailsDto>(cardWithRelations);
         }
 
         public async Task<bool> UpdateCardAsync(int id, CardUpdateDto cardUpdateDto)

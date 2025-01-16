@@ -49,21 +49,13 @@ namespace MagicDatabase.Repositories.Implementations
             // Salva i cambiamenti
             int result = await _context.SaveChangesAsync();
 
-            // Controlla se l'operazione ha avuto successo
+            // Controlla se il salvataggio è andato a buon fine
             if (result > 0)
             {
-                // Carica le relazioni della carta appena salvata
-                return await _context.Cards
-                    .Include(c => c.CardRarity)
-                    .Include(c => c.CardStatus)
-                    .Include(c => c.CardSubCategory)
-                        .ThenInclude(sub => sub.CardCategory)
-                    .Include(c => c.CardLanguage)
-                    .Include(c => c.CardArtType)
-                    .FirstOrDefaultAsync(c => c.CardId == card.CardId);
+                return card; // Restituisci la carta con l'ID assegnato dal database
             }
 
-            // In caso di fallimento, lancia un'eccezione o restituisci null
+            // In caso di fallimento
             throw new Exception("Non sono riuscito ad aggiungere la carta al database :( ");
         }
 
