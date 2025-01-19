@@ -53,12 +53,11 @@ namespace MagicDatabase.API.Controllers
         }
 
         private User GetUserFromCredentials(LoginModel login)
-
         {
 
             // Replace this with logic to retrieve the User object based on validated credentials.
 
-            return new User { Id = 1, Username = "Francesco" }; // Example (replace with real logic)
+            return new User { UserId = 1, Username = "Francesco" };
 
         }
     }

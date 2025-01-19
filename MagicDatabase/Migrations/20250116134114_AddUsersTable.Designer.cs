@@ -3,6 +3,7 @@ using MagicCardsAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MagicDatabase.Migrations
 {
     [DbContext(typeof(MagicCardsContext))]
-    partial class MagicCardsContextModelSnapshot : ModelSnapshot
+    [Migration("20250116134114_AddUsersTable")]
+    partial class AddUsersTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1565,13 +1568,13 @@ namespace MagicDatabase.Migrations
 
             modelBuilder.Entity("MagicDatabase.Models.User", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -1583,25 +1586,9 @@ namespace MagicDatabase.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = 1,
-                            PasswordHash = "AQAAAAIAAYagAAAAEMgGyTNY+63SxWRQvr8BMWgLU1/BEBmnDUmIJiULsodH4E4ZIdOzTyDeRVPjGWzeiQ==",
-                            Role = "Admin",
-                            Username = "admin"
-                        },
-                        new
-                        {
-                            UserId = 2,
-                            PasswordHash = "AQAAAAIAAYagAAAAEBOEswCXnqyE9WOQXrq6ZWGg1OvbhUACNp+UptJqhXGSQTilKJ77zmGhHpolW6cHLA==",
-                            Role = "User",
-                            Username = "user"
-                        });
                 });
 
             modelBuilder.Entity("MagicDatabase.Models.Card", b =>

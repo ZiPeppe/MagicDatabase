@@ -1,5 +1,6 @@
 ﻿using MagicDatabase.Models;
 using MagicDatabase.Seeds;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicCardsAPI.Data
@@ -29,9 +30,15 @@ namespace MagicCardsAPI.Data
         // Tabella CardArtType
         public DbSet<CardArtType> CardArtType { get; set; }
 
+        //Tabella Users
+        public DbSet<User> Users { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Usa il seed data della classe UserSeed
+            UserSeed.SeedUsers(modelBuilder);
 
             // Configurazione della tabella CardCategory
             modelBuilder.Entity<CardCategory>(entity =>

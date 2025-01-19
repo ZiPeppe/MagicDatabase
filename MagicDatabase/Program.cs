@@ -23,6 +23,8 @@ builder.Services.AddDbContext<MagicCardsContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<ICardRepository, CardRepository>();
 builder.Services.AddScoped<ICardService, CardService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -95,8 +97,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
                         ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"])),
-
+                        IssuerSigningKey = new SymmetricSecurityKey
+                            (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"])),
                     };
 
                     // Enable logging for debugging
