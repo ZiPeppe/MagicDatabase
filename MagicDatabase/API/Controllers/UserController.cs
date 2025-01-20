@@ -1,5 +1,6 @@
 ﻿using MagicDatabase.DTOs;
 using MagicDatabase.Services.Implementations;
+using MagicDatabase.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MagicDatabase.API.Controllers
@@ -9,34 +10,34 @@ namespace MagicDatabase.API.Controllers
     [ApiExplorerSettings(IgnoreApi = true)] // Nasconde il controller da Swagger
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UserController(UserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
         }
     }
-    
-    /*public class UserController : ControllerBase
-    {
-        private readonly UserService _authService;
 
-        public UserController(UserService authService)
+        /*public class UserController : ControllerBase
         {
-            _authService = authService;
-        }
+            private readonly UserService _authService;
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
-        {
-            try
+            public UserController(UserService authService)
             {
-                var token = await _authService.AuthenticateAsync(loginDto.Username, loginDto.Password);
-                return Ok(new { Token = token });
+                _authService = authService;
             }
-            catch (UnauthorizedAccessException ex)
+
+            [HttpPost("login")]
+            public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
             {
-                return Unauthorized(new { message = ex.Message });
-            }
-        }*/
+                try
+                {
+                    var token = await _authService.AuthenticateAsync(loginDto.Username, loginDto.Password);
+                    return Ok(new { Token = token });
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    return Unauthorized(new { message = ex.Message });
+                }
+            }*/
 }
