@@ -6,7 +6,18 @@ namespace MagicDatabase.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [ApiExplorerSettings(IgnoreApi = true)] // Nasconde il controller da Swagger
     public class UserController : ControllerBase
+    {
+        private readonly UserService _userService;
+
+        public UserController(UserService userService)
+        {
+            _userService = userService;
+        }
+    }
+    
+    /*public class UserController : ControllerBase
     {
         private readonly UserService _authService;
 
@@ -27,6 +38,5 @@ namespace MagicDatabase.API.Controllers
             {
                 return Unauthorized(new { message = ex.Message });
             }
-        }
-    }
+        }*/
 }

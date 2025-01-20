@@ -1,5 +1,7 @@
 ﻿using MagicDatabase.Models;
+using MagicDatabase.Repositories.Interfaces;
 using MagicDatabase.Services.Implementations;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MagicDatabase.API.Controllers
@@ -8,57 +10,34 @@ namespace MagicDatabase.API.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
+        private readonly IUserRepository _userRepository;
         private readonly JwtService _jwtService;
+        private readonly PasswordHasher<User> _passwordHasher;
 
-        public LoginController(JwtService jwtService)
-
+        public LoginController(IUserRepository userRepository, JwtService jwtService)
         {
-
+            _userRepository = userRepository;
             _jwtService = jwtService;
-
+            _passwordHasher = new PasswordHasher<User>();
         }
 
-        [HttpPost("/login")]
-
+        [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginModel login)
-
         {
+            // Recupera l'utente dal database usando il repository
+            var user = await _userRepository.GetUserByUsernameAsync(login.Username);
 
-            // Replace with your actual user validation logic (don't store plain text passwords)
-
-            if (!IsValidUser(login))
-
+            // Verifica se l'utente esiste e se la password è valida
+            if (user == null ||
+                _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, login.Password) != PasswordVerificationResult.Success)
             {
-
-                return Unauthorized();
-
+                return Unauthorized(new { message = "Invalid username or password." });
             }
 
-            var user = GetUserFromCredentials(login); // Replace with logic to get user object
-
+            // Genera un token JWT
             var token = _jwtService.GenerateToken(user);
 
             return Ok(new { token });
-
-        }
-
-        private bool IsValidUser(LoginModel login)
-
-        {
-
-            // Replace this with your actual user validation logic (e.g., compare with a database)
-
-            return login.Username == "Francesco" && login.Password == "password123"; // Example (replace with real logic)
-
-        }
-
-        private User GetUserFromCredentials(LoginModel login)
-        {
-
-            // Replace this with logic to retrieve the User object based on validated credentials.
-
-            return new User { UserId = 1, Username = "Francesco" };
-
         }
     }
 }

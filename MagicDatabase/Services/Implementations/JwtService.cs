@@ -26,7 +26,7 @@ namespace MagicDatabase.Services.Implementations
 
                 new Claim(ClaimTypes.Name, user.Username),
 
-                // Add additional claims as needed (e.g., roles)
+                
 
             };
 
