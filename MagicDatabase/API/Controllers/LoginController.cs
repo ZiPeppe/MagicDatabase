@@ -1,4 +1,4 @@
-﻿using MagicDatabase.Models;
+﻿using MagicDatabase.DTOs;
 using MagicDatabase.Repositories.Interfaces;
 using MagicDatabase.Services.Implementations;
 using MagicDatabase.Services.Interfaces;
@@ -19,7 +19,7 @@ namespace MagicDatabase.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginModel login)
+        public async Task<IActionResult> Login([FromBody] LoginDto login)
         {
             try
             {

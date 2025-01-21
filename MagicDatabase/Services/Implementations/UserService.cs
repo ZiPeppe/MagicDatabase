@@ -44,10 +44,5 @@ namespace MagicDatabase.Services.Implementations
             // Usa il JwtService per generare il token JWT
             return _jwtService.GenerateToken(user);
         }
-
-        public async Task<User> GetUserByUsernameAsync(string username)
-        {
-            return await _userRepository.GetUserByUsernameAsync(username);
-        }
     }
 }
