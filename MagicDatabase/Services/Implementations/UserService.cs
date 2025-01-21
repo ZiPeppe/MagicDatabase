@@ -6,6 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using MagicDatabase.Services.Implementations;
+
 
 namespace MagicDatabase.Services.Implementations
 {
@@ -13,13 +15,13 @@ namespace MagicDatabase.Services.Implementations
     {
         private readonly IUserRepository _userRepository;
         private readonly PasswordHasher<User> _passwordHasher;
-        private readonly IConfiguration _configuration;
+        private readonly JwtService _jwtService;
 
-        public UserService(IUserRepository userRepository, IConfiguration configuration)
+        public UserService(IUserRepository userRepository, JwtService jwtService)
         {
             _userRepository = userRepository;
             _passwordHasher = new PasswordHasher<User>();
-            _configuration = configuration;
+            _jwtService = jwtService;
         }
 
         public async Task<string> AuthenticateAsync(string username, string password)
@@ -39,35 +41,13 @@ namespace MagicDatabase.Services.Implementations
                 throw new UnauthorizedAccessException("Invalid username or password.");
             }
 
-            // Genera un token JWT per l'utente autenticato
-            return GenerateJwtToken(user);
+            // Usa il JwtService per generare il token JWT
+            return _jwtService.GenerateToken(user);
         }
 
         public async Task<User> GetUserByUsernameAsync(string username)
         {
             return await _userRepository.GetUserByUsernameAsync(username);
-        }
-
-        private string GenerateJwtToken(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]); // Legge la chiave dal file di configurazione
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role) // Opzionale
-            }),
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:TokenExpiryInMinutes"])),
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
         }
     }
 }

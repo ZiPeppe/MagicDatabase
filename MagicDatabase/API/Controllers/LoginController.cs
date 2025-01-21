@@ -1,6 +1,7 @@
 ﻿using MagicDatabase.Models;
 using MagicDatabase.Repositories.Interfaces;
 using MagicDatabase.Services.Implementations;
+using MagicDatabase.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,34 +11,26 @@ namespace MagicDatabase.API.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
-        private readonly JwtService _jwtService;
-        private readonly PasswordHasher<User> _passwordHasher;
+        private readonly IUserService _userService;
 
-        public LoginController(IUserRepository userRepository, JwtService jwtService)
+        public LoginController(IUserService userService)
         {
-            _userRepository = userRepository;
-            _jwtService = jwtService;
-            _passwordHasher = new PasswordHasher<User>();
+            _userService = userService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginModel login)
         {
-            // Recupera l'utente dal database usando il repository
-            var user = await _userRepository.GetUserByUsernameAsync(login.Username);
-
-            // Verifica se l'utente esiste e se la password è valida
-            if (user == null ||
-                _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, login.Password) != PasswordVerificationResult.Success)
+            try
+            {
+                // Usa il servizio per autenticare e ottenere il token
+                var token = await _userService.AuthenticateAsync(login.Username, login.Password);
+                return Ok(new { token });
+            }
+            catch (UnauthorizedAccessException)
             {
                 return Unauthorized(new { message = "Invalid username or password." });
             }
-
-            // Genera un token JWT
-            var token = _jwtService.GenerateToken(user);
-
-            return Ok(new { token });
         }
     }
 }
