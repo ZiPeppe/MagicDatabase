@@ -1,4 +1,4 @@
-﻿namespace MagicDatabase.Models
+﻿namespace MagicDatabase.Utilities
 {
     public class JwtSettings
     {

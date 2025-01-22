@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using MagicDatabase.Models;
+using MagicDatabase.Utilities;
 
 namespace MagicDatabase.Services.Implementations
 {
