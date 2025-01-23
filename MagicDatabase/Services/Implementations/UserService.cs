@@ -44,5 +44,40 @@ namespace MagicDatabase.Services.Implementations
             // Usa il JwtService per generare il token JWT
             return _jwtService.GenerateToken(user);
         }
+        public async Task<RefreshToken> GenerateRefreshTokenAsync(User user)
+        {
+            var refreshToken = new RefreshToken
+            {
+                UserId = user.UserId,
+                Token = Guid.NewGuid().ToString(),
+                ExpiryDate = DateTime.UtcNow.AddDays(7) // valido per 7 giorni
+            };
+
+            await _userRepository.SaveRefreshTokenAsync(refreshToken);
+
+            return refreshToken;
+        }
+        public async Task<string> RefreshTokenAsync(string refreshToken)
+        {
+            var token = await _userRepository.GetRefreshTokenAsync(refreshToken);
+
+            if (token == null || token.ExpiryDate <= DateTime.UtcNow)
+            {
+                throw new UnauthorizedAccessException("Invalid or expired refresh token.");
+            }
+
+            var user = await _userRepository.GetUserByIdAsync(token.UserId);
+
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("Invalid refresh token.");
+            }
+
+            // Invalida il vecchio token
+            await _userRepository.DeleteRefreshTokenAsync(refreshToken);
+
+            // Genera un nuovo JWT e un nuovo refresh token
+            return _jwtService.GenerateToken(user);
+        }
     }
 }
