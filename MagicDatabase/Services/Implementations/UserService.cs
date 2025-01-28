@@ -44,8 +44,13 @@ namespace MagicDatabase.Services.Implementations
             // Usa il JwtService per generare il token JWT
             return _jwtService.GenerateToken(user);
         }
-        public async Task<RefreshToken> GenerateRefreshTokenAsync(User user)
+        public async Task<RefreshToken> GenerateRefreshTokenAsync(string username)
         {
+            var user = await _userRepository.GetUserByUsernameAsync(username);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found");
+            }
             var refreshToken = new RefreshToken
             {
                 UserId = user.UserId,
