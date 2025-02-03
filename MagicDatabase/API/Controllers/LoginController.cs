@@ -40,22 +40,17 @@ namespace MagicDatabase.API.Controllers
             }
         }
 
-        [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        [HttpPost("validate-refresh-token")]
+        public async Task<IActionResult> ValidateRefreshToken([FromBody] RefreshTokenRequest request)
         {
-            try
-            {
-                // Usa il servizio per verificare il refresh token e ottenere un nuovo access token
-                var newAccessToken = await _userService.RefreshTokenAsync(request.RefreshToken);
+            var newAccessToken = await _userService.ValidateRefreshTokenAsync(request.RefreshToken);
 
-                // Restituisci il nuovo access token al client
-                return Ok(new { accessToken = newAccessToken });
-            }
-            catch (UnauthorizedAccessException ex)
+            if (string.IsNullOrEmpty(newAccessToken))
             {
-                // Se il token non è valido, restituisci uno stato 401
-                return Unauthorized(new { message = ex.Message });
+                return Unauthorized(new { message = "Invalid or expired refresh token." });
             }
+
+            return Ok(new { accessToken = newAccessToken });
         }
     }
 }

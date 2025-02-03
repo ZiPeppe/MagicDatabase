@@ -31,6 +31,11 @@ namespace MagicDatabase.Repositories.Implementations
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
         }
+        public async Task UpdateRefreshTokenAsync(RefreshToken refreshToken)
+        {
+            _context.RefreshTokens.Update(refreshToken);
+            await _context.SaveChangesAsync();
+        }
         public async Task DeleteRefreshTokenAsync(string refreshToken)
         {
             var token = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);

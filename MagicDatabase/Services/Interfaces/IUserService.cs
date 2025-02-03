@@ -6,6 +6,6 @@ namespace MagicDatabase.Services.Interfaces
     {
         Task<string> AuthenticateAsync(string username, string password);
         Task<RefreshToken> GenerateRefreshTokenAsync(string username);
-        Task<string> RefreshTokenAsync(string refreshToken);
+        Task<string> ValidateRefreshTokenAsync(string refreshToken);
     }
 }

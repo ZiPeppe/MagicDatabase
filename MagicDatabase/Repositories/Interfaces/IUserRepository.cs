@@ -9,5 +9,6 @@ namespace MagicDatabase.Repositories.Interfaces
         Task<RefreshToken> GetRefreshTokenAsync(string token);
         Task<User> GetUserByIdAsync(int userId);
         Task DeleteRefreshTokenAsync(string refreshToken);
+        Task UpdateRefreshTokenAsync(RefreshToken refreshToken);
     }
 }
