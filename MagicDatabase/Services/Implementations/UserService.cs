@@ -24,46 +24,51 @@ namespace MagicDatabase.Services.Implementations
             _jwtService = jwtService;
         }
 
-        public async Task<string> AuthenticateAsync(string username, string password)
+        public async Task<string?> AuthenticateAsync(string username, string password)
         {
             var user = await _userRepository.GetUserByUsernameAsync(username);
 
+            // Se l'utente non esiste, restituisci null o un codice di errore
             if (user == null)
             {
-                throw new UnauthorizedAccessException("Invalid username or password.");
+                return null;
             }
 
             // Verifica la password
             var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
 
+            // Se la password non è valida, restituisci null o un codice di errore
             if (result != PasswordVerificationResult.Success)
             {
-                throw new UnauthorizedAccessException("Invalid username or password.");
+                return null;
             }
 
             // Usa il JwtService per generare il token JWT
             return _jwtService.GenerateToken(user);
         }
 
-        public async Task<RefreshToken> GenerateRefreshTokenAsync(string username)
+        public async Task<RefreshToken?> GenerateRefreshTokenAsync(string username)
         {
             var user = await _userRepository.GetUserByUsernameAsync(username);
+
+            // Se l'utente non esiste, restituisci null
             if (user == null)
             {
-                throw new InvalidOperationException("User not found");
+                return null;
             }
+
             var refreshToken = new RefreshToken
             {
                 UserId = user.UserId,
                 Token = Guid.NewGuid().ToString(),
-                ExpiryDate = DateTime.UtcNow.AddDays(7) // valido per 7 giorni
+                ExpiryDate = DateTime.UtcNow.AddDays(7)
             };
 
             await _userRepository.SaveRefreshTokenAsync(refreshToken);
 
             return refreshToken;
         }
-        public async Task<string> ValidateRefreshTokenAsync(string refreshToken)
+        public async Task<string?> ValidateRefreshTokenAsync(string refreshToken)
         {
             // Logica per validare il refresh token
             var token = await _userRepository.GetRefreshTokenAsync(refreshToken);
