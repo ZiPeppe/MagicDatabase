@@ -20,7 +20,13 @@ namespace MagicDatabase.Services.Implementations
         public async Task<CardDetailsDto> GetCardByIdAsync(int id)
         {
             var card = await _cardRepository.GetCardByIdAsync(id);
-            return card == null ? null : _mapper.Map<CardDetailsDto>(card);
+            // Se non troviamo la carta, restituiamo null
+            if (card == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<CardDetailsDto>(card);
         }
 
         public async Task<IEnumerable<CardDetailsDto>> GetAllCardsAsync()
@@ -37,8 +43,20 @@ namespace MagicDatabase.Services.Implementations
             // Salva la carta tramite il repository
             var savedCard = await _cardRepository.AddCardAsync(card);
 
+            if (savedCard == null)
+            {
+                // Se qualcosa va storto nel salvataggio, restituiamo null
+                return null;
+            }
+
             // Carica le relazioni usando un metodo esistente o dedicato
             var cardWithRelations = await _cardRepository.GetCardByIdAsync(savedCard.CardId);
+
+            if (cardWithRelations == null)
+            {
+                // Se non troviamo la carta con le relazioni, restituiamo null
+                return null;
+            }
 
             // Restituisci un DTO completo della carta salvata
             return _mapper.Map<CardDetailsDto>(cardWithRelations);
@@ -46,18 +64,23 @@ namespace MagicDatabase.Services.Implementations
 
         public async Task<bool> UpdateCardAsync(int id, CardUpdateDto cardUpdateDto)
         {
+            // Controlla se la carta esiste
             var existingCard = await _cardRepository.GetCardByIdAsync(id);
             if (existingCard == null)
             {
+                // Se non esiste, restituiamo false
                 return false;
             }
 
+            // Applica gli aggiornamenti
             _mapper.Map(cardUpdateDto, existingCard);
+            // Restituisci true o false a seconda del risultato
             return await _cardRepository.UpdateCardAsync(existingCard);
         }
 
         public async Task<bool> DeleteCardAsync(int id)
         {
+            // Restituisce true o false a seconda del successo
             return await _cardRepository.DeleteCardAsync(id);
         }
     }
