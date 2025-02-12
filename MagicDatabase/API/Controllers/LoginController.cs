@@ -22,22 +22,22 @@ namespace MagicDatabase.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto login)
         {
-            try
-            {
-                // Usa il servizio per autenticare e ottenere il token
-                var token = await _userService.AuthenticateAsync(login.Username, login.Password);
-                // Genera il refresh token
-                var refreshToken = await _userService.GenerateRefreshTokenAsync(login.Username);
-                return Ok(new
-                {
-                    token,
-                    refreshToken = refreshToken.Token
-                });
-            }
-            catch (UnauthorizedAccessException)
+            var token = await _userService.AuthenticateAsync(login.Username, login.Password);
+
+            // Se il token è nullo o vuoto, significa che l'autenticazione è fallita
+            if (string.IsNullOrEmpty(token))
             {
                 return Unauthorized(new { message = "Invalid username or password." });
             }
+
+            // Genera il refresh token
+            var refreshToken = await _userService.GenerateRefreshTokenAsync(login.Username);
+
+            return Ok(new
+            {
+                token,
+                refreshToken = refreshToken.Token
+            });
         }
 
         [HttpPost("validate-refresh-token")]
