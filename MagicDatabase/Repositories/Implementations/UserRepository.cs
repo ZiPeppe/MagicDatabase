@@ -25,7 +25,10 @@ namespace MagicDatabase.Repositories.Implementations
         }
         public async Task<RefreshToken> GetRefreshTokenAsync(string token)
         {
-            return await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == token);
+            var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == token);
+            // Se il token non esiste, ritorna null, che è già il comportamento normale di FirstOrDefaultAsync.
+            // Non c'è bisogno di lanciare eccezioni qui, va bene mantenere il comportamento di default.
+            return refreshToken;
         }
         public async Task<User> GetUserByIdAsync(int userId)
         {
@@ -36,14 +39,19 @@ namespace MagicDatabase.Repositories.Implementations
             _context.RefreshTokens.Update(refreshToken);
             await _context.SaveChangesAsync();
         }
-        public async Task DeleteRefreshTokenAsync(string refreshToken)
+        public async Task<bool> DeleteRefreshTokenAsync(string refreshToken)
         {
             var token = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken);
-            if (token != null)
+
+            if (token == null)
             {
-                _context.RefreshTokens.Remove(token);
-                await _context.SaveChangesAsync();
+                return false; // Non trovato, restituisci false
             }
+
+            _context.RefreshTokens.Remove(token);
+            var result = await _context.SaveChangesAsync();
+
+            return result > 0; // Restituisce true se è stato eliminato con successo
         }
     }
 }
