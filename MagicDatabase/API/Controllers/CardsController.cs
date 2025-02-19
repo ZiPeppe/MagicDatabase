@@ -83,6 +83,11 @@ namespace MagicDatabase.API.Controllers
 
                 var createdCard = await _cardService.AddCardAsync(cardDto);
 
+                if (createdCard == null)
+                {
+                    return StatusCode(500, "Errore nel creare la carta.");
+                }
+
                 return CreatedAtAction(nameof(GetCard), new { id = createdCard.CardId }, createdCard);
             }
             catch (Exception ex)

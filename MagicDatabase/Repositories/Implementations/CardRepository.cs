@@ -51,9 +51,6 @@ namespace MagicDatabase.Repositories.Implementations
 
             // Restituisci la carta se il salvataggio è riuscito, altrimenti restituisci null o un valore di errore
             return result > 0 ? card : null;
-
-            // In caso di fallimento
-            throw new Exception("Non sono riuscito ad aggiungere la carta al database :( ");
         }
 
         // Aggiorna una carta esistente
